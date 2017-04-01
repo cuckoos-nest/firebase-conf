@@ -76,18 +76,50 @@ exports.onWallItemAdded = functions.database.ref('/wall/{userId}/')
         
     });
 
+exports.onUploadCommentAdded = functions.database.ref('/upload-comments/{uploadId}/{commentId}')
+    .onWrite(event => {
+        // Increace upload comments count
+        admin.database().ref(`/uploads/${event.params.uploadId}/commentsCount`).once('value').then(function(commentsCount) {
+            let count = 1;
+            if (commentsCount.exists()) {
+                if (event.data.exists()) {
+                    // Add comment  
+                    count = commentsCount.val() + 1;
+                }
+                else {
+                    // Remove comment
+                    count = commentsCount.val() - 1;
+                }
+            }
+
+            admin.database().ref(`/uploads/${event.params.uploadId}/commentsCount`).set(count);
+        });
+    });
+
 exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{userId}')
     .onWrite(event => {
+        // Increace upload likes count
+        admin.database().ref(`/uploads/${event.params.uploadId}/likesCount`).once('value').then(function(likesCount) {
+            let count = 1;
+            if (likesCount.exists()) {
+                if (event.data.exists()) {
+                    // Like
+                    count = likesCount.val() + 1;
+                }
+                else {
+                    // Unlike
+                    count = likesCount.val() - 1;
+                }
+            }
+
+            admin.database().ref(`/uploads/${event.params.uploadId}/likesCount`).set(count);
+        });
+
+
         if (!event.data.exists()) {
             // Unlike
             return;
         }
-
-        // Not sure if it's necessary
-        // Increace upload likes count
-        // admin.database().ref(`/uploads/${event.params.uploadId}/likesCount`).once('value').then(function(likesCount) {
-        //     admin.database().ref(`/uploads/${event.params.uploadId}/likesCount`).set(likesCount.val() + 1);
-        // });
 
         // Send notification
         admin.database().ref(`/uploads/${event.params.uploadId}/`).once('value').then(function(upload) {
