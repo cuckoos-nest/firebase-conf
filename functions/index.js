@@ -29,6 +29,10 @@ exports.createUser = functions.auth.user().onCreate(event => {
 
 exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
     .onWrite(event => {
+        if (event.data.previous.exists() || !event.data.exists()) {
+            return;
+        }
+
         const upload = event.data.val();
         // Add to user's uploads
         admin.database().ref(`/users/${upload.user}/uploads/${event.params.uploadId}`).set(true);
@@ -69,6 +73,11 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
         // Add to photo's uploads
         admin.database().ref(`/photos/${upload.photo}/uploads/${event.params.uploadId}`).set(true);
         
+        // Set the creation date
+        event.data.ref.child('createdAt').set(new Date().toLocaleString());
+
+        // Index the description
+        admin.database().ref(`/upload-descriptions/${upload.description.substring(0, 3)}/${event.params.uploadId}`).set(upload.description);
     });
 
 exports.onWallItemAdded = functions.database.ref('/wall/{userId}/')
