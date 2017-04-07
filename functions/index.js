@@ -74,7 +74,13 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
         admin.database().ref(`/photos/${upload.photo}/uploads/${event.params.uploadId}`).set(true);
         
         // Set the creation date
-        event.data.ref.child('createdAt').set(new Date().toLocaleString());
+        var options = {
+            timeZone: 'Asia/Jerusalem',
+            year: 'numeric', month: 'numeric', day: 'numeric',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+        };
+
+        event.data.ref.child('createdAt').set(new Date().toLocaleString([], options));
 
         // Index the description
         admin.database().ref(`/upload-descriptions/${upload.description.substring(0, 3)}/${event.params.uploadId}`).set(upload.description);
