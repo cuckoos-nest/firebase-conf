@@ -17,12 +17,12 @@ admin.initializeApp({
 exports.createUser = functions.auth.user().onCreate(event => {
     const user = event.data;
     admin.database().ref(`/users/${user.uid}`).set({
-        categoryFollowingCount: 0,
+        followingPhotoCount: 0,
         displayName: user.displayName,
         image: user.photoURL, 
-        numberOfFollowers: 0,
-        numberOfFollowing: 0,
-        numberOfUploads: 0,
+        followersCount: 0,
+        followingUsersCount: 0,
+        uploadsCount: 0,
         createdAt: new Date().toLocaleString(),
     });
 });
@@ -38,8 +38,8 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
         admin.database().ref(`/users/${upload.user}/uploads/${event.params.uploadId}`).set(true);
         
         // Increace user's upload count
-        admin.database().ref(`/users/${upload.user}/numberOfUploads`).once('value').then(function(numberOfUploads) {
-            admin.database().ref(`/users/${upload.user}/numberOfUploads`).set(numberOfUploads.val() + 1);
+        admin.database().ref(`/users/${upload.user}/uploadsCount`).once('value').then(function(uploadsCount) {
+            admin.database().ref(`/users/${upload.user}/uploadsCount`).set(uploadsCount.val() + 1);
         });
 
         // Add to user's wall
