@@ -7,6 +7,13 @@ admin.initializeApp({
 });
 
 
+const timezoneOptions = {
+    timeZone: 'Asia/Jerusalem',
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric',
+};
+
+
 // // Start writing Firebase Functions
 // // https://firebase.google.com/functions/write-firebase-functions
 //
@@ -23,7 +30,7 @@ exports.createUser = functions.auth.user().onCreate(event => {
         followersCount: 0,
         followingUsersCount: 0,
         uploadsCount: 0,
-        createdAt: new Date().toLocaleString(),
+        createdAt: new Date().toLocaleString([], timezoneOptions),
     });
 });
 
@@ -74,13 +81,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
         admin.database().ref(`/photos/${upload.photo}/uploads/${event.params.uploadId}`).set(true);
         
         // Set the creation date
-        var options = {
-            timeZone: 'Asia/Jerusalem',
-            year: 'numeric', month: 'numeric', day: 'numeric',
-            hour: 'numeric', minute: 'numeric', second: 'numeric',
-        };
-
-        event.data.ref.child('createdAt').set(new Date().toLocaleString([], options));
+        event.data.ref.child('createdAt').set(new Date().toLocaleString([], timezoneOptions));
 
         // Index the description
         admin.database().ref(`/upload-descriptions/${upload.description.substring(0, 3)}/${event.params.uploadId}`).set(upload.description);
@@ -144,7 +145,7 @@ exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{us
                     from: event.params.userId,
                     upload: event.params.uploadId,
                     isRead: false,
-                    createdAt: new Date().toLocaleString(),
+                    createdAt: new Date().toLocaleString([], timezoneOptions),
                 });
             }
         });
