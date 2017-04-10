@@ -13,14 +13,6 @@ const timezoneOptions = {
     hour: 'numeric', minute: 'numeric', second: 'numeric',
 };
 
-
-// // Start writing Firebase Functions
-// // https://firebase.google.com/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// })
-
 exports.createUser = functions.auth.user().onCreate(event => {
     const user = event.data;
     admin.database().ref(`/users/${user.uid}`).set({
@@ -33,6 +25,29 @@ exports.createUser = functions.auth.user().onCreate(event => {
         createdAt: new Date().toLocaleString([], timezoneOptions),
     });
 });
+
+exports.onUserUploadDeleted = functions.database.ref('/uploads/{uploadId}')
+    .onWrite(event => {
+        if (event.data.previous.exists() && !event.data.exists()) {
+
+            // Remove from all walls
+            admin.database().ref(`/upload-to-walls/${event.params.uploadId}/`).once('value').then(function(wallKeys) {
+                if (wallKeys.val()) {
+                    for (const wallKey of Object.keys(wallKeys.val())) {
+                        admin.database().ref(`/walls/${wallKey}/${event.params.uploadId}`).set(null);
+                    }
+                }
+            });
+
+            // Remove from photo
+            admin.database().ref(`/photos/${event.data.previous.val().photo}/uploads/${event.params.uploadId}`).set(null);
+
+            // Remove from user
+            admin.database().ref(`/users/${event.data.previous.val().user}/uploads/${event.params.uploadId}`).set(null);
+
+            admin.database().ref(`/archive/uploads/${event.params.uploadId}`).set(event.data.previous.val());
+        }
+    });
 
 exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
     .onWrite(event => {
@@ -51,6 +66,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
 
         // Add to user's wall
         admin.database().ref(`/walls/${upload.user}/${event.params.uploadId}`).set(true);
+        admin.database().ref(`/upload-to-walls/${event.params.uploadId}/${upload.user}/`).set(true);
 
         // Add to category followers wall
         admin.database().ref(`/photos/${upload.photo}`).once('value').then(function(photo) {
@@ -60,6 +76,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
                         const followers = Object.keys(followerKeys.val());
                         for (const follower of followers) {
                             admin.database().ref(`/walls/${follower}/${event.params.uploadId}`).set(true);
+                            admin.database().ref(`/upload-to-walls/${event.params.uploadId}/${follower}/`).set(true);
                         }
                     }
                 });
@@ -72,6 +89,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
                 const followers = Object.keys(followerKeys.val());
                 for (const follower of followers) {
                     admin.database().ref(`/walls/${follower}/${event.params.uploadId}`).set(true);
+                    admin.database().ref(`/upload-to-walls/${event.params.uploadId}/${follower}/`).set(true);
                 }
             }
         });
