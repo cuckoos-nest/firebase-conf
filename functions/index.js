@@ -75,7 +75,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
                 }
             }
         });
-        
+
         
         // Add to photo's uploads
         admin.database().ref(`/photos/${upload.photo}/uploads/${event.params.uploadId}`).set(true);
