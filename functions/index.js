@@ -161,7 +161,8 @@ exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{us
                 admin.database().ref(`/notifications/${upload.val().user}`).push({
                     type: 1,
                     from: event.params.userId,
-                    upload: event.params.uploadId,
+                    link: 'upload',
+                    linkKey: event.params.uploadId,
                     isRead: false,
                     createdAt: new Date().toLocaleString([], timezoneOptions),
                 });
