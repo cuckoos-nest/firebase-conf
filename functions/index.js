@@ -49,6 +49,46 @@ exports.onUserUploadDeleted = functions.database.ref('/uploads/{uploadId}')
         }
     });
 
+// exports.generateThumbnail = functions.storage.object()
+//     .onChange(event => {
+//         const gcs = require('@google-cloud/storage')();
+//         const spawn = require('child-process-promise').spawn;
+
+//         const object = event.data;
+//         const filePath = object.name;
+//         const resourceState = object.resourceState;
+//         const fileBucket = object.bucket;
+//         const bucket = gcs.bucket(fileBucket);
+//         const contentType = object.contentType;
+
+//         if (resourceState == 'exists' && filePath.startsWith('images/uploads/')) {
+//             const folder = filePath.substring(0, filePath.lastIndexOf('/'));
+//             const uploadKey = folder.split('/').pop();
+//             const fileName = filePath.split('/').pop();
+//             if (fileName == 'original') {
+//                 const tempFilePath = `/tmp/${fileName}`;
+//                 bucket.file(filePath).download({
+//                     destination: tempFilePath
+//                 }).then(() => {
+//                     // Generate a thumbnail using ImageMagick.
+//                     spawn('convert', [tempFilePath, '-thumbnail', '200x200>', tempFilePath]).then(() => {
+//                         const thumbFilePath = folder + "/small";
+//                         // Uploading the thumbnail.
+//                         bucket.upload(tempFilePath, {
+//                             destination: thumbFilePath,
+//                             metadata: {
+//                                 contentType: contentType,
+//                             }
+//                         }).then(() => {
+//                             admin.database().ref(`/uploads/${uploadKey}/ready`).set(true);
+//                         });
+//                     });
+//                 });
+//             }
+
+//         }
+//     });
+
 exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
     .onWrite(event => {
         if (event.data.previous.exists() || !event.data.exists()) {
@@ -84,7 +124,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
         });
 
         // Add to user's followers wall
-        admin.database().ref(`/user-followers/users-follow-x/${upload.user}`).once('value').then(function(followerKeys) {
+        admin.database().ref(`/user-followers/users-follow-me/${upload.user}`).once('value').then(function(followerKeys) {
             if (followerKeys.val()) {
                 const followers = Object.keys(followerKeys.val());
                 for (const follower of followers) {
@@ -170,10 +210,42 @@ exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{us
         });
     });
 
-exports.clearUploads = functions.https
+exports.clean = functions.https
     .onRequest((req, res) => {
-        // Implement..
-        //admin.database().ref(`/uploads`).set(null);
+        admin.database().ref('/acrhive').set(null);    
+        admin.database().ref('/uploads').set(null);
+        admin.database().ref('/upload-likes').set(null);
+        admin.database().ref('/comments').set(null);
+        admin.database().ref('/notifications').set(null);
+        admin.database().ref('/photo-followers').set(null);
+        admin.database().ref('/recent-searches').set(null);
+        admin.database().ref('/upload-comments').set(null);
+        admin.database().ref('/upload-descriptions').set(null);     
+        admin.database().ref('/upload-to-walls').set(null);     
+        admin.database().ref('/user-followers').set(null);     
+        admin.database().ref('/walls').set(null);    
+
+        admin.database().ref(`/photos`).once('value').then(function(photos) {
+            if (photos.exists()) {
+                let keys = Object.keys(photos.val());
+                for(key of keys) {
+                    admin.database().ref(`/photos/${key}/uploads`).set(null);
+                }
+            }
+        });
+
+        admin.database().ref(`/users`).once('value').then(function(users) {
+            if (users.exists()) {
+                let keys = Object.keys(users.val());
+                for(key of keys) {
+                    admin.database().ref(`/users/${key}/uploads`).set(null);
+                    admin.database().ref(`/users/${key}/followersCount`).set(null);
+                    admin.database().ref(`/users/${key}/followingPhotoCount`).set(null);
+                    admin.database().ref(`/users/${key}/followingUsersCount`).set(null);
+                    admin.database().ref(`/users/${key}/uploadsCount`).set(null);
+                }
+            }
+        });
     });
 
 exports.clearUsers = functions.https
