@@ -170,6 +170,20 @@ exports.onUploadCommentAdded = functions.database.ref('/upload-comments/{uploadI
         });
     });
 
+exports.onPhotoFollowerAdded = functions.database.ref('/photo-followers/{photoId}/{userId}')
+    .onWrite(event => {
+        admin.database().ref(`/users/${event.params.userId}/followingPhotoCount`).once('value').then(function(followingPhotoCount) {
+            let count = followingPhotoCount.val();
+            if (event.data.exists()) {
+                count++;
+            }
+            else {
+                count--;
+            }
+            admin.database().ref(`/users/${event.params.userId}/followingPhotoCount`).set(count);
+        });
+    });
+
 exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{userId}')
     .onWrite(event => {
         // Increace upload likes count
