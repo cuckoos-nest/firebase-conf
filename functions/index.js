@@ -184,6 +184,26 @@ exports.onPhotoFollowerAdded = functions.database.ref('/photo-followers/{photoId
         });
     });
 
+exports.onCommentLikeAdded = functions.database.ref('/comment-likes/{commentId}/{userId}')
+    .onWrite(event => {
+        // Increace comment likes count
+        admin.database().ref(`/comments/${event.params.commentId}/likesCount`).once('value').then(function(likesCount) {
+            let count = 1;
+            if (likesCount.exists()) {
+                if (event.data.exists()) {
+                    // Like
+                    count = likesCount.val() + 1;
+                }
+                else {
+                    // Unlike
+                    count = likesCount.val() - 1;
+                }
+            }
+
+            admin.database().ref(`/comments/${event.params.commentId}/likesCount`).set(count);
+        });
+    });
+
 exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{userId}')
     .onWrite(event => {
         // Increace upload likes count
