@@ -24,6 +24,7 @@ exports.createUser = functions.auth.user().onCreate(event => {
         uploadsCount: 0,
         createdAt: new Date().toLocaleString([], timezoneOptions),
     });
+    
 });
 
 exports.onUserUploadDeleted = functions.database.ref('/uploads/{uploadId}')
@@ -238,6 +239,7 @@ exports.onUploadLikeAdded = functions.database.ref('/upload-likes/{uploadId}/{us
                     link: 'upload',
                     linkKey: event.params.uploadId,
                     isRead: false,
+                    isSystem: false,
                     createdAt: new Date().toLocaleString([], timezoneOptions),
                 });
             }
@@ -286,3 +288,50 @@ exports.clearUsers = functions.https
     .onRequest((req, res) => {
         // Implement..
     });
+
+exports.reportAdded = functions.database.ref('/reports/{reportKey}')
+   .onWrite(event => {
+      let count = 1;
+      admin.database().ref(`/uploads/${event.params.reportKey}/reportsCount`).once('value').then(function(reportsCount) {
+        
+            if (reportsCount.exists()) {
+                if (event.data.exists()) {
+                    count = reportsCount.val() + 1;
+                }
+               
+            }
+
+            admin.database().ref(`/uploads/${event.params.reportKey}/reportsCount`).set(count);
+      
+            // after 5 reports the picture will be deleted automatically
+        if(count == 5)
+        { 
+         
+         
+       admin.database().ref(`/uploads/${event.params.reportKey}`).set(null);
+     
+        }
+
+    
+    });
+
+
+    if(count == 5)
+    {
+           // alert the user that its photo has been deleted
+            admin.database().ref(`/uploads/${event.params.reportKey}/`).once('value').then(function(upload) {
+                admin.database().ref(`/notifications/${upload.val().user}`).push({
+                            type: 2,
+                            from: 'Administrator',
+                            link: 'upload',
+                            linkKey: event.params.reportKey,
+                            isRead: false,
+                            isSystem: true,
+                            createdAt: new Date().toLocaleString([], timezoneOptions),
+                        });
+
+                               
+     
+            });
+    }
+   })
