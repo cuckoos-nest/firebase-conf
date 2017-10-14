@@ -19,4 +19,4 @@ If you need any help running this project locally, plesae use [this tutorial](ht
 
 If you need access to the Facebook application or Firebase account for contribution needs, let us know and we will work something out.
 
-Feel free to contact us on: eliran013@gmail.co
+Feel free to contact us on: eliran013@gmail.com
