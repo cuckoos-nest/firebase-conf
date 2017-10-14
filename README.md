@@ -6,10 +6,10 @@ This repo holds the configuration files for [Cuckoo's Nest](https://github.com/c
 
 ## Content
 ### Firebase Functions
-[functions/index.js](https://github.com/cuckoos-nest/firebase-conf/blob/master/functions/index.js) defines database triggers and HTTP fucntions which the application needs to operate. For example, a trigger to update likes counter for a post, a trigger to create metadata for new users, a trigger that adds a post to follower wall, and so on...
+[functions/index.js](https://github.com/cuckoos-nest/firebase-conf/blob/master/functions/index.js) defines database triggers and HTTP functions the application needs to operate, such as: A trigger to update the likes counter for a post, a trigger to create metadata for new users, a trigger that adds a post to a follower's wall, and so on...
 
 ### Administrator Dashboard
-The [administrator dashboard](https://github.com/cuckoos-nest/firebase-conf/tree/master/public) is a webpage that allows an administrator to easily add photos and cateogries to the database.
+The [administrator dashboard](https://github.com/cuckoos-nest/firebase-conf/tree/master/public) is a webpage that allows an administrator to easily add photos and categories to the database.
 
 ## Running it locally
 If you need help to run this project locally, plesae use the [Firebase's official tutorial](https://firebase.google.com/docs/functions/local-emulator)
@@ -19,4 +19,4 @@ If you need help to run this project locally, plesae use the [Firebase's officia
 
 If you need access to the Facebook application or Firebase account for contribution needs, let us know and we will work something out.
 
-Feel free to contact us on: eliran013@gmail.co
+Feel free to contact us on: eliran013@gmail.com
