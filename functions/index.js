@@ -100,7 +100,7 @@ exports.onUserUploadCreated = functions.database.ref('/uploads/{uploadId}')
         // Add to user's uploads
         admin.database().ref(`/users/${upload.user}/uploads/${event.params.uploadId}`).set(true);
         
-        // Increace user's upload count
+        // Increase user's upload count
         admin.database().ref(`/users/${upload.user}/uploadsCount`).once('value').then(function(uploadsCount) {
             admin.database().ref(`/users/${upload.user}/uploadsCount`).set(uploadsCount.val() + 1);
         });
@@ -153,7 +153,7 @@ exports.onWallItemAdded = functions.database.ref('/wall/{userId}/')
 
 exports.onUploadCommentAdded = functions.database.ref('/upload-comments/{uploadId}/{commentId}')
     .onWrite(event => {
-        // Increace upload comments count
+        // Increase upload comments count
         admin.database().ref(`/uploads/${event.params.uploadId}/commentsCount`).once('value').then(function(commentsCount) {
             let count = 1;
             if (commentsCount.exists()) {
@@ -318,7 +318,7 @@ exports.reportAdded = functions.database.ref('/reports/{reportKey}')
 
     if(count == 5)
     {
-           // alert the user that its photo has been deleted
+           // alert the user that their photo has been deleted
             admin.database().ref(`/uploads/${event.params.reportKey}/`).once('value').then(function(upload) {
                 admin.database().ref(`/notifications/${upload.val().user}`).push({
                             type: 2,
