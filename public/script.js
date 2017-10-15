@@ -1,5 +1,5 @@
 // Initialize Firebase
-var config = {
+const config = {
     apiKey: "AIzaSyBz1z_mA1sZsQNYTh8RK8p76aE_gU-xcGc",
     authDomain: "cuckoos-nest-7a4cf.firebaseapp.com",
     databaseURL: "https://cuckoos-nest-7a4cf.firebaseio.com",
@@ -12,20 +12,20 @@ firebase.initializeApp(config);
 
 window.onload = () => {
     document.querySelector("body").style.display = 'none';
-    var provider = new firebase.auth.FacebookAuthProvider();
+    const provider = new firebase.auth.FacebookAuthProvider();
     // provider.setCustomParameters({
     //     'display': 'popup'
     // });
-    firebase.auth().signInWithPopup(provider).then(function(result) {
+    firebase.auth().signInWithPopup(provider).then((result) => {
 
-        var user = result.user;
+        const user = result.user;
         document.getElementById("welcome_message").innerText = `Welcome, ${user.displayName}`;
 
-        firebase.database().ref("/categories").once('value').then(function(snapshot) {
+        firebase.database().ref("/categories").once('value').then((snapshot) => {
             let select = document.getElementById("photo_category");
             let categories = snapshot.val();
             for (let key in categories) {
-                var option = document.createElement("option");
+                const option = document.createElement("option");
                 option.value = key;
                 option.text = categories[key].name;
                 select.add(option);
@@ -42,11 +42,11 @@ window.onload = () => {
             let image = document.getElementById("photo_image");
 
             if (title.value.length > 3 && image.files.length == 1) {
-                var file = image.files[0];
-                var reader = new FileReader();
+                const file = image.files[0];
+                const reader = new FileReader();
 
-                reader.onload = function(readerEvt) {
-                    var binaryString = readerEvt.target.result;
+                reader.onload = (readerEvt) => {
+                    const binaryString = readerEvt.target.result;
                     let ref = firebase.storage().ref(`/images/photos/${new Date().toISOString()}`);
                     ref
                         .put(binaryString, { contentType: 'image/jpeg' })
@@ -83,11 +83,11 @@ window.onload = () => {
             let image = document.getElementById("category_image");
 
             if (name.value.length > 3 && image.files.length == 1) {
-                var file = image.files[0];
-                var reader = new FileReader();
+                const file = image.files[0];
+                const reader = new FileReader();
 
                 reader.onload = function(readerEvt) {
-                    var binaryString = readerEvt.target.result;
+                    const binaryString = readerEvt.target.result;
                     let ref = firebase.storage().ref(`/images/categories/${new Date().toISOString()}`);
                     ref
                         .put(binaryString, { contentType: 'image/jpeg' })
@@ -112,20 +112,20 @@ window.onload = () => {
     }).catch(err => alert(`Authentication error: ${err}`));
 }
 
-function getBase64Image(img) {
+const getBase64Image = (img) => {
     // Create an empty canvas element
-    var canvas = document.createElement("canvas");
+    const canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
 
     // Copy the image contents to the canvas
-    var ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
 
     // Get the data-URL formatted image
     // Firefox supports PNG and JPEG. You could check img.src to guess the
     // original format, but be aware the using "image/jpg" will re-encode the image.
-    var dataURL = canvas.toDataURL("image/png");
+    const dataURL = canvas.toDataURL("image/png");
 
     return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
