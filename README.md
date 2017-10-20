@@ -12,7 +12,7 @@ This repo holds the configuration files for [Cuckoo's Nest](https://github.com/c
 The [administrator dashboard](https://github.com/cuckoos-nest/firebase-conf/tree/master/public) is a webpage that allows an administrator to easily add photos and categories to the database.
 
 ## Running it locally
-If you need help to run this project locally, plesae use the [Firebase's official tutorial](https://firebase.google.com/docs/functions/local-emulator)
+If you need help to run this project locally, please use the [Firebase's official tutorial](https://firebase.google.com/docs/functions/local-emulator)
 
 ## Contributing
 [Check for open issues](https://github.com/cuckoos-nest/firebase-conf/issues) or add your own features by starting a pull request.
