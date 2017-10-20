@@ -6,7 +6,8 @@
     "child-process-promise": "^2.2.1",
     "firebase-admin": "^4.1.2",
     "firebase-functions": "^0.5",
-    "jimp": "^0.2.27"
+    "jimp": "^0.2.27",
+    "typescript": "^2.5.3"
   },
   "private": true
 }
